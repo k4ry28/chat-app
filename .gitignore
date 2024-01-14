@@ -36,6 +36,7 @@ lerna-debug.log*
 
 # environment variables
 .env
+/Environments/*
 
 # docker data volume
 /Docker/data
