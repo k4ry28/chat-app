@@ -11,39 +11,37 @@ datasource db {
 }
 
 model Chat {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt String
-  updatedAt String
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime
+  userIDs   String[]  @db.ObjectId
+  users     User[]    @relation(fields: [userIDs], references: [id])
   Message   Message[]
-  ChatUser  ChatUser[]
 }
 
 model Message {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  chatId    String @db.ObjectId
-  createdAt String
-  text      String
-  userId    String @db.ObjectId
-  chat      Chat   @relation(fields: [chatId], references: [id])
-  user      User   @relation(fields: [userId], references: [id])
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  chatId          String   @db.ObjectId
+  chat            Chat     @relation(fields: [chatId], references: [id])
+  content         String
+  status          String
+  createdAt       DateTime @default(now())
+  sender          String   @db.ObjectId
+  user            User     @relation(fields: [sender], references: [id])
+  quotedMessageId String?  @unique @db.ObjectId
+  quotedMessage   Message? @relation("QuotedMessage", fields: [quotedMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replyMessage    Message? @relation("QuotedMessage")
 }
 
 model User {
-  id        String     @id @default(auto()) @map("_id") @db.ObjectId
-  createdAt String
-  name      String
-  email     String
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  username  String
+  email     String    @unique
   password  String
   status    String
+  createdAt DateTime  @default(now())
+  chatIDs   String[]  @db.ObjectId
+  chats     Chat[]    @relation(fields: [chatIDs], references: [id])
   Message   Message[]
-  ChatUser  ChatUser[]
-}
-
-model ChatUser {
-  id     String @id @default(auto()) @map("_id") @db.ObjectId
-  chatId String @db.ObjectId
-  userId String @db.ObjectId
-
-  chat Chat @relation(fields: [chatId], references: [id])
-  user User @relation(fields: [userId], references: [id])
 }
